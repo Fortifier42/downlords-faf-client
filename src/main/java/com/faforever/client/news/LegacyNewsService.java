@@ -81,8 +81,9 @@ public class LegacyNewsService implements NewsService {
       String title = syndEntry.getTitle();
       String content = syndEntry.getContents().get(0).getValue();
       Date publishedDate = syndEntry.getPublishedDate();
+      NewsCategory newsCategory = NewsCategory.fromString(syndEntry.getCategories().get(0).getName());
 
-      result.add(new NewsItem(author, link, title, content, publishedDate));
+      result.add(new NewsItem(author, link, title, content, publishedDate, newsCategory));
     }
 
     return result;
