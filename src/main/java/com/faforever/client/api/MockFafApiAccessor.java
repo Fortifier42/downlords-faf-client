@@ -246,6 +246,11 @@ public class MockFafApiAccessor implements FafApiAccessor {
   }
 
   @Override
+  public Game findReplayById(int id) {
+    return null;
+  }
+
+  @Override
   public void changePassword(String username, String currentPasswordHash, String newPasswordHash) {
 
   }

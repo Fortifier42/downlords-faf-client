@@ -113,4 +113,5 @@ public interface FafApiAccessor {
   void deleteMapVersionReview(Integer id);
 
   Game findReplayById(int id);
+
 }

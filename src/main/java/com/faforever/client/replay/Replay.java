@@ -127,6 +127,11 @@ public class Replay {
     return teams;
   }
 
+
+  public static String getReplayUrl(int replayId, String baseUrl) {
+    return String.format(baseUrl, replayId);
+  }
+
   public Path getReplayFile() {
     return replayFile.get();
   }
@@ -179,11 +184,11 @@ public class Replay {
     return startTime.get();
   }
 
-  public void setStartTime(Temporal startTime) {
+  public void setStartTime(OffsetDateTime startTime) {
     this.startTime.set(startTime);
   }
 
-  public void setStartTime(OffsetDateTime startTime) {
+  public void setStartTime(Temporal startTime) {
     this.startTime.set(startTime);
   }
 
