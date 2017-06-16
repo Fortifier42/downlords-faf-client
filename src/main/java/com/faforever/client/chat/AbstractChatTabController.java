@@ -8,6 +8,8 @@ import com.faforever.client.fx.Controller;
 import com.faforever.client.fx.JavaFxUtil;
 import com.faforever.client.fx.PlatformService;
 import com.faforever.client.fx.WebViewConfigurer;
+import com.faforever.client.fx.WindowController;
+import com.faforever.client.fx.WindowController.WindowButtonType;
 import com.faforever.client.i18n.I18n;
 import com.faforever.client.main.NavigateEvent;
 import com.faforever.client.main.NavigationItem;
@@ -21,6 +23,8 @@ import com.faforever.client.player.Player;
 import com.faforever.client.player.PlayerService;
 import com.faforever.client.preferences.ChatPrefs;
 import com.faforever.client.preferences.PreferencesService;
+import com.faforever.client.replay.ReplayDetailController;
+import com.faforever.client.replay.ReplayService;
 import com.faforever.client.reporting.ReportingService;
 import com.faforever.client.theme.UiService;
 import com.faforever.client.ui.StageHolder;
@@ -54,6 +58,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -148,6 +153,8 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
   private final List<ChatMessage> waitingMessages;
   private final IntegerProperty unreadMessagesCount;
   private final ChangeListener<Boolean> resetUnreadMessagesListener;
+  private final ReplayService replayService;
+  private final String replayUrlPrefix = "replay:";
   @VisibleForTesting
   Popup clanInfoPopup;
   private int lastEntryId;
@@ -168,6 +175,7 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
   private ChangeListener<Boolean> stageFocusedListener;
   private Popup playerInfoPopup;
   private ChatMessage lastMessage;
+  private ReplayDetailController replayDetailController;
 
   @Inject
   // TODO cut dependencies
@@ -178,7 +186,8 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
                                    TimeService timeService, I18n i18n,
                                    ImageUploadService imageUploadService, UrlPreviewResolver urlPreviewResolver,
                                    NotificationService notificationService, ReportingService reportingService, UiService uiService,
-                                   AutoCompletionHelper autoCompletionHelper, EventBus eventBus, CountryFlagService countryFlagService) {
+                                   AutoCompletionHelper autoCompletionHelper, EventBus eventBus, CountryFlagService countryFlagService,
+                                   ReplayService replayService) {
 
     this.webViewConfigurer = webViewConfigurer;
     this.clanService = clanService;
@@ -198,6 +207,7 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
     this.autoCompletionHelper = autoCompletionHelper;
     this.eventBus = eventBus;
     this.countryFlagService = countryFlagService;
+    this.replayService = replayService;
 
     waitingMessages = new ArrayList<>();
     unreadMessagesCount = new SimpleIntegerProperty();
@@ -497,6 +507,24 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
    * Called from JavaScript when user clicked a URL.
    */
   public void openUrl(String url) {
+    if (url.contains(replayUrlPrefix)) {
+      //wrong querry
+      replayService.findByQuery("id==\"" + url.replace(replayUrlPrefix, "") + "\"", 1)
+          .thenAccept(replays -> {
+            replayDetailController = uiService.loadFxml("theme/vault/replay/replay_detail.fxml");
+            replayDetailController.setReplay(replays.get(0));
+
+            Node replayDetailRoot = replayDetailController.getRoot();
+            replayDetailRoot.setVisible(true);
+            replayDetailRoot.requestFocus();
+
+            Stage stage = new Stage();
+            WindowController windowController = new WindowController(uiService);
+            windowController.configure(stage, (Region) replayDetailRoot, true, WindowButtonType.CLOSE);
+            stage.show();
+          });
+      return;
+    }
     platformService.showDocument(url);
   }
 
@@ -643,6 +671,9 @@ public abstract class AbstractChatTabController implements Controller<Tab> {
         text = matcher.replaceAll("<span class='self'>" + matcher.group(1) + "</span>");
         onMention(chatMessage);
       }
+
+      text = text.replaceAll("#([0-9]+)", "<a href=\"javascript.void(0)\" onClick=\"chatTab.openUrl(\'" + replayUrlPrefix + "$1\')" + "\">" + i18n.get("chat.replay") + " $1" + "</a>");
+
       String html = CharStreams.toString(reader).replace("{text}", text);
 
       Collection<String> cssClasses = new ArrayList<>();

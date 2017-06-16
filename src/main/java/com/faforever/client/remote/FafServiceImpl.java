@@ -446,6 +446,11 @@ public class FafServiceImpl implements FafService {
   }
 
   @Override
+  public CompletableFuture<Replay> findReplayById(int id) {
+    return CompletableFuture.completedFuture(Replay.fromDto(fafApiAccessor.findReplayById(id)));
+  }
+
+  @Override
   @Async
   public CompletableFuture<Optional<Clan>> getClanByTag(String tag) {
     return CompletableFuture.completedFuture(fafApiAccessor.getClanByTag(tag)

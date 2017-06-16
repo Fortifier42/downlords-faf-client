@@ -294,6 +294,12 @@ public class ReplayServiceImpl implements ReplayService {
   }
 
   @Override
+  public CompletableFuture<Replay> findById(int id) {
+    return fafService.findReplayById(id);
+
+  }
+
+  @Override
   public CompletableFuture<Path> downloadReplay(int id) {
     ReplayDownloadTask task = applicationContext.getBean(ReplayDownloadTask.class);
     task.setReplayId(id);

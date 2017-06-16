@@ -141,4 +141,6 @@ public interface FafService {
   Optional<MapBean> findMapById(String id);
 
   CompletableFuture<Void> deleteMapVersionReview(Review review);
+
+  CompletableFuture<Replay> findReplayById(int id);
 }

@@ -24,6 +24,7 @@ import com.faforever.client.vault.review.ReviewsController;
 import com.faforever.commons.io.Bytes;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -65,6 +66,7 @@ public class ReplayDetailController implements Controller<Node> {
   private final ReviewService reviewService;
   public Pane replayDetailRoot;
   public Label titleLabel;
+  public Button copyButton;
   public Label dateLabel;
   public Label timeLabel;
   public Label modLabel;
@@ -126,6 +128,8 @@ public class ReplayDetailController implements Controller<Node> {
     moreInformationPane.setVisible(false);
 
     reviewsController.getRoot().setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+    copyButton.setText(i18n.get("replay.copyLink"));
   }
 
   public void setReplay(Replay replay) {
@@ -281,5 +285,9 @@ public class ReplayDetailController implements Controller<Node> {
 
   public void onWatchButtonClicked() {
     replayService.runReplay(replay);
+  }
+
+  public void copyLink(ActionEvent actionEvent) {
+    //TODO: copy ID to clipboard
   }
 }

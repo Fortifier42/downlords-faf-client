@@ -30,6 +30,8 @@ public interface ReplayService {
 
   CompletableFuture<List<Replay>> findByQuery(String condition, int maxResults);
 
+  CompletableFuture<Replay> findById(int id);
+
   CompletableFuture<Path> downloadReplay(int id);
 
   /**
