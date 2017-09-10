@@ -461,6 +461,11 @@ public class MainController implements Controller<Node> {
     this.platformService.reveal(logPath);
   }
 
+  public void onChat(ActionEvent actionEvent) {
+    chatButton.pseudoClassStateChanged(HIGHLIGHTED, false);
+    onNavigate(actionEvent);
+  }
+
   public class PopupDisplayer implements InvalidationListener {
     private final TransientNotificationsController transientNotificationsController;
 
@@ -477,7 +482,8 @@ public class MainController implements Controller<Node> {
       }
 
       Rectangle2D visualBounds = getTransientNotificationAreaBounds();
-      double anchorX = visualBounds.getMaxX() - 1, anchorY = visualBounds.getMaxY() - 1;
+      double anchorX = visualBounds.getMaxX() - 1;
+      double anchorY = visualBounds.getMaxY() - 1;
       switch (preferencesService.getPreferences().getNotification().toastPositionProperty().get()) {
         case BOTTOM_RIGHT:
           transientNotificationsPopup.setAnchorLocation(AnchorLocation.CONTENT_BOTTOM_RIGHT);
@@ -497,13 +503,9 @@ public class MainController implements Controller<Node> {
           break;
         default:
           transientNotificationsPopup.setAnchorLocation(AnchorLocation.CONTENT_BOTTOM_RIGHT);
+          break;
       }
       transientNotificationsPopup.show(mainRoot.getScene().getWindow(), anchorX, anchorY);
     }
-  }
-
-  public void onChat(ActionEvent actionEvent) {
-    chatButton.pseudoClassStateChanged(HIGHLIGHTED, false);
-    onNavigate(actionEvent);
   }
 }
