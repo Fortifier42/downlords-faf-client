@@ -953,6 +953,17 @@
   -fx-border-width: 0;
 }
 
+
+/*******************************************************************************
+ *                                                                             *
+ * Pagination                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.pagination-control {
+  -fx-font-size: 1.5em;
+}
+
 /***************** Icon *****************/
 
 .icon {
@@ -1331,6 +1342,11 @@
   -fx-padding: 10 20;
   -fx-border-width: 0 0 2 0;
   -fx-border-color: transparent;
+}
+
+.main-navigation-button:highlighted {
+  -fx-background-color: -fx-accent;
+  -fx-text-fill: -primary-text-color-inverse;
 }
 
 .main-navigation-button:hover {
