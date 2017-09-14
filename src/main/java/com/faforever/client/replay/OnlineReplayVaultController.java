@@ -93,13 +93,15 @@ public class OnlineReplayVaultController extends AbstractViewController<Node> {
     loadingPane.setVisible(false);
     backButton.setVisible(true);
     populateReplays(replays, searchResultPane,append);
-    moreButton.setVisible(searchResultPane.getChildren().size() % MAX_SEARCH_RESULTS == 0&&searchResultPane.getChildren().size()!=0);
+    moreButton.setVisible(replays.size() == MAX_SEARCH_RESULTS);
   }
 
   private void populateReplays(List<Replay> replays, Pane pane,boolean append) {
     ObservableList<Node> children = pane.getChildren();
     Platform.runLater(() -> {
-      if(!append)children.clear();
+      if (!append) {
+        children.clear();
+      }
 
       replays.forEach(replay -> {
         ReplayCardController controller = uiService.loadFxml("theme/vault/replay/replay_card.fxml");
@@ -112,6 +114,10 @@ public class OnlineReplayVaultController extends AbstractViewController<Node> {
         }
       });
     });
+  }
+
+  public void populateReplays(List<Replay> replays, Pane pane) {
+    populateReplays(replays, pane, false);
   }
 
   public void onShowReplayDetail(Replay replay) {
@@ -153,6 +159,7 @@ public class OnlineReplayVaultController extends AbstractViewController<Node> {
     searchResultGroup.setVisible(false);
     loadingPane.setVisible(false);
     backButton.setVisible(false);
+    moreButton.setVisible(false);
   }
 
   private void onSearch(String query) {
@@ -175,9 +182,9 @@ public class OnlineReplayVaultController extends AbstractViewController<Node> {
   private void refresh() {
     enterSearchingState();
     replayService.getNewestReplays(TOP_ELEMENT_COUNT,1)
-        .thenAccept(replays -> populateReplays(replays, newestPane,false))
-        .thenCompose(aVoid -> replayService.getHighestRatedReplays(TOP_ELEMENT_COUNT,1).thenAccept(modInfoBeans -> populateReplays(modInfoBeans, highestRatedPane,false)))
-        .thenCompose(aVoid -> replayService.getMostWatchedReplays(TOP_ELEMENT_COUNT,1).thenAccept(modInfoBeans -> populateReplays(modInfoBeans, mostWatchedPane,false)))
+        .thenAccept(replays -> populateReplays(replays, newestPane))
+        .thenCompose(aVoid -> replayService.getHighestRatedReplays(TOP_ELEMENT_COUNT, 1).thenAccept(modInfoBeans -> populateReplays(modInfoBeans, highestRatedPane)))
+        .thenCompose(aVoid -> replayService.getMostWatchedReplays(TOP_ELEMENT_COUNT, 1).thenAccept(modInfoBeans -> populateReplays(modInfoBeans, mostWatchedPane)))
         .thenRun(this::enterShowroomState)
         .exceptionally(throwable -> {
           logger.warn("Could not populate replays", throwable);
